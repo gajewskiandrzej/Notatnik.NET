@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+﻿using System.Windows;
+using Microsoft.Win32;
+using System.IO;
 
 namespace Notatnik.NET
 {
@@ -20,9 +9,34 @@ namespace Notatnik.NET
     /// </summary>
     public partial class MainWindow : Window
     {
+        private OpenFileDialog openFileDialog;
+        private string traceFile = null;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            openFileDialog = new OpenFileDialog();
+            openFileDialog.Title = "Wybierz plik tekstowy";
+            openFileDialog.DefaultExt = "txt";
+            openFileDialog.Filter = "Pliki tekstowe (*.txt) | *.txt|Pliki XML" +
+                "(*.xml)|*.xml|Pliki źródłowe (*.cs)|*.cs|Wszystkie pliki(*.*)|*.*";
+            openFileDialog.FilterIndex = 1;
+        }
+        private void MenuItem_Open_Click(object sender, RoutedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(traceFile))
+            {
+                openFileDialog.InitialDirectory = Path.GetDirectoryName(traceFile);
+                openFileDialog.FileName = Path.GetFileName(traceFile);
+            }
+            bool? result = openFileDialog.ShowDialog();
+            if(result.HasValue && result.Value)
+            {
+                traceFile = openFileDialog.FileName;
+                textBox.Text = File.ReadAllText(traceFile);
+                statusBarText.Text = Path.GetFileName(traceFile);
+            }
         }
     }
 }
